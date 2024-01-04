@@ -23,8 +23,17 @@
         {{ block "comment-list-element" .}}
         <li class="list-group-item" style="padding: 8px;">
             <div class="row row-cols-2">
-                <div class="col" style="font-size: 24px; float: left;">
-                    {{ .Author }}: {{ .Text }}
+                <div class="col" style="float: left;" >
+                    <div style="font-size: 32px;">
+                        <p>
+                            {{ .Author }}:
+                        </p>
+                    </div>
+                    <div style="font-size: 24px;">
+                        <p>
+                            {{ .Text }}
+                        </p>
+                    </div>
                 </div>
                 <div class="col" style="float: right;">
                     {{ .Time }}
