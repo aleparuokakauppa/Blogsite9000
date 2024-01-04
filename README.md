@@ -15,12 +15,12 @@ This is a personal project, so change source code as needed
 ## Run
 `./main`
 ## Creating posts
-- Create a MariaDB (MySQL) database, with appropriate permissions for the user you wish to use
-- Source the `create-posts.sql` and `create-comments.sql` in the cli
+- Create a MariaDB (MySQL) database with name "Blogsite9000", with appropriate permissions for the user you wish to use
+- Source the `create-posts.sql` and `create-comments.sql` in the cli of the user you wish to use
+- Set environmental variables for the DB with: `USERNAME="[username]"; PASSWORD="[password]";`
 - Create a post with:
   
    `INSERT INTO posts (Author, Title, LinkToPost) VALUES ("[author name]", "[post title]", "[path to html formatted blog post]");`
-- Set environmental variables for the DB with: `USERNAME="[username]"; PASSWORD="[password]";`
 
 # Roadmap
 - Cleaning up
