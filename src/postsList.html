@@ -1,0 +1,22 @@
+<div style="text-align: center; padding-top: 40px;">
+    <h1><br> Alepa's Post Caravan </br></h1>
+    <h4 style="color: gray;">Click on a post to open it!</h2>
+</div>
+
+<div id="list-element" style="color: gray;margin: 5%; padding-top: 30px; padding-left: 30%; padding-right: 30%; margin: 0 auto;">
+    <!--
+    <ul class="list-group">
+    -->
+    <ul>
+        {{ range .Posts }}
+        <li class="list-group-item">
+        <div style="padding-bottom: 20px; font-size: 30px;">
+            <a href="/getPostWithID" hx-get="/getPostWithID?ID={{ .ID }}" hx-target=".innerContent" >
+                {{ .Author }}: {{ .Title }}
+            </a>
+        </div>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
