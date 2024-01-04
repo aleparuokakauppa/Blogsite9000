@@ -39,7 +39,7 @@ func connectDB() error {
         Passwd: os.Getenv("$PASSWORD"),
         Net:    "tcp",
         Addr:   "127.0.0.1:3306",
-        DBName: "blogsite",
+        DBName: "Blogsite9000",
         AllowNativePasswords: true,
     }
     // Get a database handle.
@@ -47,6 +47,7 @@ func connectDB() error {
     db, err = sql.Open("mysql", cfg.FormatDSN())
     if err != nil {
         log.Fatal(err)
+        return err
     }
 
     pingErr := db.Ping()
@@ -58,11 +59,22 @@ func connectDB() error {
 }
 
 func main() {
-    println("Trying to access database...")
+	// Open or create a log file
+	file, err := os.OpenFile("logs/logfile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Failed to open log file:", err)
+        return
+	}
+	defer file.Close()
+
+	// Set the log output to the file
+	log.SetOutput(file)
+    log.Println("Trying to access database...")
     if err := connectDB(); err != nil {
-        panic(err.Error())
+        log.Fatal(err.Error())
+        return
     }
-    println("Starting server.")
+    log.Println("Starting server.")
 
     http.HandleFunc("/", serveMain)
     http.HandleFunc("/postComment", handlePostComment)
@@ -72,9 +84,9 @@ func main() {
     http.HandleFunc("/gpg", serveGPG)
 
     hostPort := ":8000"
-    fmt.Printf("Listening on port %s", hostPort)
+    log.Printf("Listening on port %s", hostPort)
     log.Print(http.ListenAndServe(hostPort, nil))
-    println("Bye")
+    log.Println("Bye")
 }
 
 func serveMain(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +98,8 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
     postID := r.URL.Query().Get("ID")
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
-        panic(err.Error())
+        log.Fatal(err.Error())
+        return
     }
     var comment Comment
     comment.Author = r.PostFormValue("comment-author")
@@ -100,7 +113,8 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
         alertTemplate.ExecuteTemplate(w, "notification-element", message)
     } else {
         if err := insertComment(IntPostID, comment); err != nil {
-            panic(err.Error())
+            log.Fatal(err.Error())
+            return
         }
         tmpl := template.Must(template.ParseFiles("src/post.html"))
         tmpl.ExecuteTemplate(w, "comment-list-element", Comment{Author: comment.Author, Text: comment.Text})
@@ -112,37 +126,40 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     postID := r.URL.Query().Get("ID")
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
-        panic(err.Error())
+        log.Fatal(err.Error())
+        return
     }
     // Get the post data with the ID
     postWithID, err := getPostWithID(IntPostID)
     if err != nil {
-        panic(err.Error())
+        log.Fatal(err.Error())
+        return
     }
     // Get the post's comments
     postWithID.Comments, err = getComments(IntPostID)
     if err != nil {
-        panic(err.Error())
+        log.Fatal(err.Error())
+        return
     }
     // Get the main template
     mainTmpl, err := template.ParseFiles("src/post.html")
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
-        println(err.Error())
+        log.Println(err.Error())
         return
     }
     // Get the post's content as HTML
     contentTmpl, err := template.ParseFiles(postWithID.LinkToPost)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
-        println(err.Error())
+        log.Println(err.Error())
         return
     }
     // Associate the content template with the main template
     mainTmpl, err = mainTmpl.AddParseTree("content", contentTmpl.Tree)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
-        println(err.Error())
+        log.Println(err.Error())
         return
     }
     // Render the main template
@@ -150,7 +167,7 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     err = mainTmpl.ExecuteTemplate(w, "post.html", postWithID)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
-        println(err.Error())
+        log.Println(err.Error())
         return
     }
 }
