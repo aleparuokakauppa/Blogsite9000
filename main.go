@@ -35,8 +35,8 @@ type Post struct {
 func connectDB() error {
     // Capture connection properties.
     cfg := mysql.Config{
-        User: os.Getenv("$USER"),
-        Passwd: os.Getenv("$PASSWD"),
+        User:   os.Getenv("$USERNAME"),
+        Passwd: os.Getenv("$PASSWORD"),
         Net:    "tcp",
         Addr:   "127.0.0.1:3306",
         DBName: "blogsite",
