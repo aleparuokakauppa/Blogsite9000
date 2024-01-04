@@ -1,0 +1,62 @@
+<div style="padding-left: 20%; padding-right: 20%; padding-bottom: 60px; padding-top: 10px; margin: 0 auto;">
+    {{ block "blogPost-element" .}}
+    <p id="title" style="font-size: 80px; padding: 5px; color: gray; text-align: center; padding-top: 20px; padding-bottom: 20px;">
+        <b>{{ .Title }}</b>
+    </p>
+    <div id="content" style="font-size: 16px;">
+        <p class="fs-3 lh-sm">
+        {{ template "content" . }}
+        </p>
+    </div>
+    <div id="author" style="padding-top: 10px; color: gray;">
+        Author: {{ .Author }}
+    </div>
+    {{ end }}
+</div>
+
+<div style="padding-top: 40px; padding-left: 20%; padding-right: 20%; padding-bottom: 60px; margin: 0 auto; background: #222;">
+    <h4 style="color: gray;">
+        Comments:
+    </h4>
+    <ol id="comment-list">
+        {{ range .Comments }}
+        {{ block "comment-list-element" .}}
+        <li class="list-group-item" style="padding: 8px;">
+            <div class="row row-cols-2">
+                <div class="col" style="font-size: 24px; float: left;">
+                    {{ .Author }}: {{ .Text }}
+                </div>
+                <div class="col" style="float: right;">
+                    {{ .Time }}
+                </div>
+            </div>
+        </li>
+        {{ end }}
+        {{ end }}
+    </ol>
+</div>
+
+<div style="padding-bottom: 40px; padding-top: 20px; margin: 0 auto; text-align: center; align-items: center; padding-left: 20%; padding-right: 20%;">
+    <div class="col-4">
+    {{ block "commentSubmitter-element" .}}
+    <form hx-post="/postComment?ID={{ .ID }}" hx-target="#comment-list" hx-swap="beforeend" hx-indicator="#spinner">
+        <div style="align-items: left; width: 200%;">
+        <h2 class="mb-4">Post comment</h2>
+        <span class="mb-2">
+            <label for="author">Author</label>
+            <input placeholder="Your alias" type="text" name="comment-author" id="author" class="form-control"/>
+        </span>
+        <span class="mb-3">
+            <label for="text">Comment</label>
+            <textarea placeholder="Your comment" name="comment-text" id="text" class="form-control"></textarea>
+        </span>
+        <div style="padding: 5px;"></div>
+        <button type="submit" class="btn btn-primary">
+            <span class="spinner-border spinner-border-sm htmx-indicator" id="spinner" role="status" aria-hidden="true"></span>
+            Submit
+        </button>
+        </div>
+    </form>
+    {{ end }}
+    </div>
+</div>

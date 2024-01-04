@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS posts;
+CREATE TABLE posts (
+  ID         INT AUTO_INCREMENT NOT NULL,
+  Author     VARCHAR(512) NOT NULL,
+  Title      TEXT NOT NULL,
+  LinkToPost TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
