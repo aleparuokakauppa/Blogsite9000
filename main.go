@@ -55,6 +55,7 @@ func connectDB() error {
         return fmt.Errorf("connectDB: %v", pingErr)
     }
     fmt.Println("DB Connected!")
+    log.Println("DB Connected!")
     return nil
 }
 
@@ -98,23 +99,18 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
     postID := r.URL.Query().Get("ID")
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
-        log.Fatal(err.Error())
-        return
+        log.Println(err.Error())
     }
     var comment Comment
     comment.Author = r.PostFormValue("comment-author")
     comment.Text = r.PostFormValue("comment-text")
     // If user didn't input an author
     if comment.Author == "" {
-        // TODO, DOESN'T WORK YET
-        alertTemplate := template.Must(template.ParseFiles("src/notification.html"))
-        message := "No Author given. Try again."
-        print(message)
-        alertTemplate.ExecuteTemplate(w, "notification-element", message)
+        log.Println("Tried to comment without an author.")
+        // TODO: alert the user of empty author
     } else {
         if err := insertComment(IntPostID, comment); err != nil {
-            log.Fatal(err.Error())
-            return
+            log.Println("Comment was probably posted without a valid target.", err.Error())
         }
         tmpl := template.Must(template.ParseFiles("src/post.html"))
         tmpl.ExecuteTemplate(w, "comment-list-element", Comment{Author: comment.Author, Text: comment.Text})
@@ -126,41 +122,35 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     postID := r.URL.Query().Get("ID")
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
-        log.Fatal(err.Error())
-        return
+        log.Println(err.Error())
     }
     // Get the post data with the ID
     postWithID, err := getPostWithID(IntPostID)
     if err != nil {
-        log.Fatal(err.Error())
-        return
+        log.Println("Probably ID was requested, that doesn't exist.", err.Error())
     }
     // Get the post's comments
     postWithID.Comments, err = getComments(IntPostID)
     if err != nil {
-        log.Fatal(err.Error())
-        return
+        log.Println(err.Error())
     }
     // Get the main template
     mainTmpl, err := template.ParseFiles("src/post.html")
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
-        return
     }
     // Get the post's content as HTML
     contentTmpl, err := template.ParseFiles(postWithID.LinkToPost)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
-        return
     }
     // Associate the content template with the main template
     mainTmpl, err = mainTmpl.AddParseTree("content", contentTmpl.Tree)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
-        return
     }
     // Render the main template
     //err = mainTmpl.ExecuteTemplate(w, "post.html", nil)
@@ -168,7 +158,6 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
-        return
     }
 }
 
@@ -176,13 +165,12 @@ func handleGetPosts(w http.ResponseWriter, r *http.Request) {
     tmpl := template.Must(template.ParseFiles("src/postsList.html"))
     postsFromDB, err := getPosts()
     if err != nil {
-        panic(fmt.Errorf("handleGetPosts err: %v", err.Error()))
+        log.Println(fmt.Errorf("handleGetPosts err: %v", err.Error()))
     }
     posts := map[string][]Post{
         "Posts": postsFromDB,
     }
     tmpl.Execute(w, posts)
-
 }
 
 func serveGPG(w http.ResponseWriter, r *http.Request) {
