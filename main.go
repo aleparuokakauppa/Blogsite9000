@@ -100,6 +100,7 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
         log.Println(err.Error())
+        return
     }
     var comment Comment
     comment.Author = r.PostFormValue("comment-author")
@@ -107,10 +108,14 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
     // If user didn't input an author
     if comment.Author == "" {
         log.Println("Tried to comment without an author.")
+        return
         // TODO: alert the user of empty author
     } else {
-        if err := insertComment(IntPostID, comment); err != nil {
+        if len(comment.Text) > 1500 {
+            log.Println("Tried to post comment over 1500 chars")
+        } else if err := insertComment(IntPostID, comment); err != nil {
             log.Println("Comment was probably posted without a valid target.", err.Error())
+            return
         }
         tmpl := template.Must(template.ParseFiles("src/post.html"))
         tmpl.ExecuteTemplate(w, "comment-list-element", Comment{Author: comment.Author, Text: comment.Text})
@@ -123,34 +128,40 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
         log.Println(err.Error())
+        return
     }
     // Get the post data with the ID
     postWithID, err := getPostWithID(IntPostID)
     if err != nil {
         log.Println("Probably ID was requested, that doesn't exist.", err.Error())
+        return
     }
     // Get the post's comments
     postWithID.Comments, err = getComments(IntPostID)
     if err != nil {
         log.Println(err.Error())
+        return
     }
     // Get the main template
     mainTmpl, err := template.ParseFiles("src/post.html")
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
+        return
     }
     // Get the post's content as HTML
     contentTmpl, err := template.ParseFiles(postWithID.LinkToPost)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
+        return
     }
     // Associate the content template with the main template
     mainTmpl, err = mainTmpl.AddParseTree("content", contentTmpl.Tree)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
+        return
     }
     // Render the main template
     //err = mainTmpl.ExecuteTemplate(w, "post.html", nil)
