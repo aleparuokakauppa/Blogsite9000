@@ -23,6 +23,4 @@ This is a personal project, so change source code as needed
    `INSERT INTO posts (Author, Title, LinkToPost) VALUES ("[author name]", "[post title]", "[path to html formatted blog post]");`
 
 # Roadmap
-- Cleaning up
-- Maybe a frontend for posting blog posts (currently done manually in mysql...)
-- Make problems be less fatal on the server
+- Maybe a frontend for posting blog posts (currently done manually...)
