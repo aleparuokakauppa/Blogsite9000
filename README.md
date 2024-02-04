@@ -1,6 +1,9 @@
 # Blogsite9000
 Personal blogging site template. Written in Go & HTMX.
 
+If the site is down, it's not actively being pitched to anyone.
+[The site](https://alepablog.com)
+
 # Purpose
 To:
 - learn the fundementals of how the backend of a website operates
