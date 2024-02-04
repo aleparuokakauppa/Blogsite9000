@@ -33,4 +33,5 @@ This is a personal project, so a major fork is required for deployment for other
    `INSERT INTO posts (Author, Title, LinkToPost) VALUES ("[author name]", "[post title]", "[path to html formatted blog post]");`
 
 # Roadmap
+- Back-button functionality for easier navigation
 - Maybe accounts, but since this is a toy-project, it would also be just an excercise.
