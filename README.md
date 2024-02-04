@@ -1,9 +1,7 @@
 # Blogsite9000
 Personal blogging site template. Written in Go & HTMX.
 
-If the site is down, it's not actively being pitched to anyone.
-
-[The site](https://alepablog.com)
+If [the site](https://alepablog.com) is down, it's not actively being pitched to anyone.
 
 # Purpose
 To:
