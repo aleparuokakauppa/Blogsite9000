@@ -1,16 +1,16 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-	"html/template"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
+    "database/sql"
+    "fmt"
+    "html/template"
+    "log"
+    "net/http"
+    "os"
+    "strconv"
+    "time"
 
-	"github.com/go-sql-driver/mysql"
+    "github.com/go-sql-driver/mysql"
 )
 
 var db *sql.DB
@@ -40,6 +40,7 @@ func connectDB() error {
         Net:    "tcp",
         Addr:   "127.0.0.1:3306",
         DBName: "Blogsite9000",
+
         AllowNativePasswords: true,
     }
     // Get a database handle.
@@ -49,25 +50,27 @@ func connectDB() error {
         log.Fatal(err)
         return err
     }
+
     pingErr := db.Ping()
     if pingErr != nil {
         return fmt.Errorf("connectDB: %v", pingErr)
     }
+    fmt.Println("DB Connected!")
     log.Println("DB Connected!")
     return nil
 }
 
 func main() {
-	// Open or create a log file
-	file, err := os.OpenFile("logs/logfile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatal("Failed to open log file:", err)
+    // Open or create a log file
+    file, err := os.OpenFile("logs/logfile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    if err != nil {
+        log.Fatal("Failed to open log file:", err)
         return
-	}
-	defer file.Close()
+    }
+    defer file.Close()
 
-	// Set the log output to the file
-	log.SetOutput(file)
+    // Set the log output to the file
+    log.SetOutput(file)
     log.Println("Trying to access database...")
     if err := connectDB(); err != nil {
         log.Fatal(err.Error())
@@ -82,13 +85,15 @@ func main() {
     http.HandleFunc("/image/alepa", serveLogo)
     http.HandleFunc("/gpg", serveGPG)
 
-    hostPort := ":8000"
+    hostPort := ":57270"
     log.Printf("Listening on port %s", hostPort)
     log.Print(http.ListenAndServe(hostPort, nil))
+    log.Println("Bye")
 }
 
 func serveMain(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "src/index.html")
+    log.Println("Main page served")
 }
 
 func handlePostComment(w http.ResponseWriter, r *http.Request) {
@@ -102,44 +107,40 @@ func handlePostComment(w http.ResponseWriter, r *http.Request) {
     var comment Comment
     comment.Author = r.PostFormValue("comment-author")
     comment.Text = r.PostFormValue("comment-text")
-
     // If user didn't input an author
-    // TODO: alert the user of empty author
     if comment.Author == "" {
         log.Println("Tried to comment without an author.")
         return
+        // TODO: alert the user of empty author
+    } else {
+        if len(comment.Text) > 1500 {
+            log.Println("Tried to post a comment with over 1500 chars")
+        } else if err := insertComment(IntPostID, comment); err != nil {
+            log.Println("Comment was probably posted without a valid target.", err.Error())
+        } else {
+            tmpl := template.Must(template.ParseFiles("src/post.html"))
+            tmpl.ExecuteTemplate(w, "comment-list-element", Comment{Author: comment.Author, Text: comment.Text})
+        }
     }
-    // Check if comment is too large
-    // TODO: alert the user of too many chars
-    if len(comment.Text) > 1500 {
-        log.Println("Tried to post comment over 1500 chars")
-        return
-    } 
-    // Insert comment into the DB
-    if err := insertComment(IntPostID, comment); err != nil {
-        log.Println("Comment was probably posted without a valid target.", err.Error())
-        return
-    }
-    tmpl := template.Must(template.ParseFiles("src/post.html"))
-    tmpl.ExecuteTemplate(w, "comment-list-element", Comment{Author: comment.Author, Text: comment.Text})
 }
 
 func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
-    // Get the postID from the query
+    // Get the post ID from the query
     postID := r.URL.Query().Get("ID")
     IntPostID, err := strconv.Atoi(postID)
     if err != nil {
         log.Println(err.Error())
         return
     }
-    // Get the post with ID from the DB
-    postData, err := getPostWithID(IntPostID)
+    log.Println("Post with ID=", postID, "was requested")
+    // Get the post data with the ID
+    postWithID, err := getPostWithID(IntPostID)
     if err != nil {
         log.Println("Probably ID was requested, that doesn't exist.", err.Error())
         return
     }
     // Get the post's comments
-    postData.Comments, err = getComments(IntPostID)
+    postWithID.Comments, err = getComments(IntPostID)
     if err != nil {
         log.Println(err.Error())
         return
@@ -152,7 +153,7 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
         return
     }
     // Get the post's content as HTML
-    contentTmpl, err := template.ParseFiles(postData.LinkToPost)
+    contentTmpl, err := template.ParseFiles(postWithID.LinkToPost)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
@@ -163,10 +164,9 @@ func handleGetPostWithID(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
-        return
     }
     // Render the main template
-    err = mainTmpl.ExecuteTemplate(w, "post.html", postData)
+    err = mainTmpl.ExecuteTemplate(w, "post.html", postWithID)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         log.Println(err.Error())
@@ -195,7 +195,6 @@ func serveLogo(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, imagePath)
 }
 
-// Gets all posts from the DB
 func getPosts() ([]Post, error) {
     var posts []Post
     rows, err := db.Query("SELECT * FROM posts;")
@@ -212,7 +211,6 @@ func getPosts() ([]Post, error) {
     return posts, nil
 }
 
-// Gets all of the comments with the targetID of postID from the DB
 func getComments(postID int) ([]Comment, error) {
     var comments []Comment
     getCommentQuery := "SELECT * FROM comments WHERE Target=(?);"
@@ -233,7 +231,6 @@ func getComments(postID int) ([]Comment, error) {
     return comments, nil
 }
 
-// Gets a post with a specific ID from the DB
 func getPostWithID(ID int) (Post, error) {
     var post Post
     getPostQuery := "SELECT * FROM posts WHERE ID=(?);"
@@ -248,7 +245,6 @@ func getPostWithID(ID int) (Post, error) {
     return post, nil
 }
 
-// Inserts the comment into the DB with its targetID
 func insertComment(targetID int, comment Comment) (error) {
     currentTime := time.Now()
     currentTimeString := currentTime.Format("01-02 15:04")
