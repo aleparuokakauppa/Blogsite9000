@@ -10,9 +10,6 @@ To:
 - learn fundimental techniques used in webserver development
 - Backend deployment on bare-metal Linux
 
-## Golang is overkill for a blog...
-This is true, but as a learning experience creating any full-stack project is a great learning process.
-
 # Usage
 This is a personal project, so a major fork is required for deployment for other people.
 
@@ -21,9 +18,17 @@ This is a personal project, so a major fork is required for deployment for other
 - Set environmental variables for the DB with: `USERNAME="[username]"; PASSWORD="[password]";`
 
 ## Build
-`go build`
+
+```bash
+go build
+```
+
 ## Run
+
+```bash
 `./main`
+```
+
 ## Creating posts
 
 - Create a post with:
@@ -32,4 +37,3 @@ This is a personal project, so a major fork is required for deployment for other
 
 # Roadmap
 - Back-button functionality for easier navigation
-- Maybe accounts, but since this is a toy-project, it would also be just an excercise.
