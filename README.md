@@ -24,9 +24,9 @@ go build
 ```
 
 ## Run
-
+Run the built executable
 ```bash
-`./main`
+./main
 ```
 
 ## Creating posts
