@@ -5,13 +5,13 @@ If [the site](https://alepablog.com) is down, it's not actively being pitched to
 
 # Purpose
 To:
-- learn the fundementals of how the backend of a website operates
-- learn basic interactivity through HTMX
-- learn fundimental techniques used in webserver development
+- Learn the fundementals of how the backend of a website operates
+- Learn basic interactivity through HTMX
+- Learn fundimental techniques used in webserver development
 - Backend deployment on bare-metal Linux
 
 # Usage
-This is a personal project, so a major fork is required for deployment for other people.
+This is a personal project, so a major fork is required for usage for other people.
 
 - Create a MariaDB (MySQL) database with name `Blogsite9000`, with appropriate permissions for the user you wish to use
 - Source the `create-posts.sql` and `create-comments.sql` in the cli of the user you wish to use
