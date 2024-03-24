@@ -15,7 +15,10 @@ This is a personal project, so a major fork is required for usage for other peop
 
 - Create a MariaDB (MySQL) database with name `Blogsite9000`, with appropriate permissions for the user you wish to use
 - Source the `create-posts.sql` and `create-comments.sql` in the cli of the user you wish to use
-- Set environmental variables for the DB with: `USERNAME="[username]"; PASSWORD="[password]";`
+- Set environmental variables for the DB with:
+```bash
+USERNAME="{username}"; PASSWORD="{password}";
+```
 
 ## Build
 ```bash
