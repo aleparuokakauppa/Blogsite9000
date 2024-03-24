@@ -34,5 +34,5 @@ Run the built executable
 ## Creating posts
 Using the MariaDB cli on the user added in the environmental variables
 ```SQL
-INSERT INTO posts (Author, Title, LinkToPost) VALUES ("[author name]", "[post title]", "[path to html formatted blog post]");
+INSERT INTO posts (Author, Title, LinkToPost) VALUES ("{author name}", "{post title}", "{path to html formatted blog post}");
 ```
