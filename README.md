@@ -11,6 +11,7 @@ To:
 - Backend deployment on bare-metal Linux
 # Roadmap
 - Clean the inline CSS
+- Polish the CSS
 - Refactoring
 
 # Usage
