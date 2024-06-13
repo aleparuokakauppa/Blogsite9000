@@ -9,6 +9,9 @@ To:
 - Learn basic interactivity through HTMX
 - Learn fundimental techniques used in webserver development
 - Backend deployment on bare-metal Linux
+# Roadmap
+- Clean the inline CSS
+- Refactoring
 
 # Usage
 This is a personal project, so a major fork is required for usage for other people.
